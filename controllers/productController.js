@@ -14,6 +14,7 @@ router.get('/create', (req, res) => {
 router.post('/create', (req, res) =>{
 
     productService.create(req.body)
+    console.log(req.body);
     res.redirect('/products');
 })
 

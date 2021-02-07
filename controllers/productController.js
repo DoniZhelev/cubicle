@@ -1,7 +1,6 @@
 const {Router} = require('express');
-const uniqid = require('uniqid');
-const Cube = require('../models/Cube');
 
+const productService = require('../servises/productService');
 const router = Router();
 
 router.get('/', (req, res) =>{
@@ -13,15 +12,8 @@ router.get('/create', (req, res) => {
 });
 
 router.post('/create', (req, res) =>{
-    let data = req.body;
-    let cube = new Cube(
-        uniqid(),
-     data.name, 
-     data.description,
-      data.imageUrl,
-       data.difficultyLevel);
-    console.log(cube);
 
+    productService.create(req.body)
     res.redirect('/products');
 })
 

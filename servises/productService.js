@@ -1,7 +1,8 @@
 const Cube = require('../models/Cube');
 const fs = require('fs');
 const fsPromises = fs.promises;
-const path = require('path')
+const path = require('path');
+const Accessory = require('../models/Accessory')
 
 
 
@@ -27,12 +28,23 @@ function getOne(id) {
   
 }
 
+function getOneWithAccessories(id) {
+    return Cube.findById(id).populate('accessories').lean();
+}
+
 function create(data) {
     let cube = new Cube(data)
   return cube.save();
  // call back WAY
 
    
+}
+async function attachAccessory(productId, accessoryId) {
+    let product = await Cube.findById(productId)
+    let accessory = await Accessory.findById(accessoryId);
+    console.log(product);
+    product.accessories.push(accessory);
+    return product.save();
 }
 
 // return fs.writeFile(
@@ -44,5 +56,7 @@ function create(data) {
 module.exports = {
     getAll,
     getOne,
-    create
+    getOneWithAccessories,
+    create,
+    attachAccessory
 }

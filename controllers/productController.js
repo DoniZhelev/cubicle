@@ -1,22 +1,30 @@
-const {Router} = require('express');
+const {
+    Router
+} = require('express');
 
 const productService = require('../servises/productService');
+const accessoryService = require('../servises/accessoryService');
 const router = Router();
 
-router.get('/', (req, res) =>{
+router.get('/', (req, res) => {
 
     productService.getAll(req.query)
-    .then(products => {
+        .then(products => {
 
-        res.render('home', {title: 'Browse', products})
-    })
+            res.render('home', {
+                title: 'Browse',
+                products
+            })
+        })
 });
 
 router.get('/create', (req, res) => {
-    res.render('create', { title: 'Create'})
+    res.render('create', {
+        title: 'Create'
+    })
 });
 
-router.post('/create', (req, res) =>{
+router.post('/create', (req, res) => {
 
     // productService.create(req.body, (err) =>{
     //     if(err) {
@@ -24,16 +32,34 @@ router.post('/create', (req, res) =>{
     //     }
     //     res.redirect('/products');
     // })
-   productService.create(req.body)
-   .then(() => res.redirect('/products'))
-   .catch(() => res.status(500).end())
+    productService.create(req.body)
+        .then(() => res.redirect('/products'))
+        .catch(() => res.status(500).end())
 })
 
-router.get('/details/:productId',  async (req, res) =>{
-    
-    let product =  await productService.getOne(req.params.productId)
-    
-    res.render('details', {title: 'Product Details', product})
+router.get('/details/:productId', async (req, res) => {
+
+    let product = await productService.getOneWithAccessories(req.params.productId)
+
+    res.render('details', {
+        title: 'Product Details',
+        product
+    })
+});
+
+router.get('/:productId/attach', async (req, res) => {
+    let product = await productService.getOne(req.params.productId)
+    let accessories = await accessoryService.getAllWithout(product.accessories);
+    res.render('attachAccessory', {
+        product,
+        accessories
+    });
+});
+
+router.post('/:productId/attach',  (req, res) => {
+    console.log(req.body);
+    productService.attachAccessory(req.params.productId, req.body.accessory)
+        .then(() => res.redirect(`/products/details/${req.params.productId}`))
 });
 
 module.exports = router;
